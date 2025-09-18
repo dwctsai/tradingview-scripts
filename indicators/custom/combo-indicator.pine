@@ -1,0 +1,130 @@
+//@version=6
+//indicator(title="Multi EMA + VWAP Combo", shorttitle="Multi EMA + VWAP Combo", overlay=true)
+indicator(title="Multi EMA + VWAP Combo", shorttitle="Multi EMA + VWAP Combo", overlay=true, timeframe="", timeframe_gaps=true)
+
+// =======================
+// Multi EMA Inputs (First)
+// =======================
+src = close
+//len1 = input.int(25, minval=1, title="EMA 1")
+//len2 = input.int(75, minval=1, title="EMA 2")
+//len3 = input.int(200, minval=1, title="EMA 3")
+//len4 = input.int(10, minval=1, title="EMA 4")
+//len5 = input.int(300, minval=1, title="EMA 5")
+EMA_GROUP = "EMA Settings"
+len1 = input.int(9, minval=1, title="EMA 1", group=EMA_GROUP)
+len2 = input.int(21, minval=1, title="EMA 2", group=EMA_GROUP)
+len3 = input.int(50, minval=1, title="EMA 3", group=EMA_GROUP)
+len4 = input.int(100, minval=1, title="EMA 4", group=EMA_GROUP)
+len5 = input.int(200, minval=1, title="EMA 5", group=EMA_GROUP)
+
+// Multi EMA Calculation
+ema1 = ta.ema(src, len1)
+ema2 = ta.ema(src, len2)
+ema3 = ta.ema(src, len3)
+ema4 = ta.ema(src, len4)
+ema5 = ta.ema(src, len5)
+
+// EMA Colors (same as original)
+//col1 = color.lime
+//col2 = color.blue
+//col3 = color.red
+//col4 = color.gray
+//col5 = color.gray
+//col1 = color.new(color.aqua, 35)
+col1 = color.rgb(91, 156, 246, 35)
+col2 = color.new(color.white, 35)
+col3 = color.new(color.orange, 35)
+col4 = color.new(color.yellow, 35)
+col5 = color.new(color.green, 35)
+
+// Multi EMA Plots
+plot(ema1, title="EMA 1", style=plot.style_line, linewidth=2, color=col1)
+plot(ema2, title="EMA 2", style=plot.style_line, linewidth=2, color=col2)
+plot(ema3, title="EMA 3", style=plot.style_line, linewidth=2, color=col3)
+plot(ema4, title="EMA 4", style=plot.style_line, linewidth=1, color=col4)
+plot(ema5, title="EMA 5", style=plot.style_line, linewidth=1, color=col5)
+
+// =======================
+// VWAP Inputs (Second)
+// =======================
+hideonDWM = input.bool(false, title="Hide VWAP on 1D or Above", group="VWAP Settings", display = display.data_window)
+var anchor = input.string(defval = "Session", title="Anchor Period",
+     options=["Session", "Week", "Month", "Quarter", "Year", "Decade", "Century", "Earnings", "Dividends", "Splits"], group="VWAP Settings")
+src_vwap = input.source(defval=hlc3, title = "Source", group="VWAP Settings", display = display.data_window)
+offset = input.int(0, title="Offset", group="VWAP Settings", minval=0, display = display.data_window)
+
+BANDS_GROUP = "Bands Settings"
+CALC_MODE_TOOLTIP = "Determines the units used to calculate the distance of the bands. When 'Percentage' is selected, a multiplier of 1 means 1%."
+calcModeInput = input.string("Standard Deviation", "Bands Calculation Mode", options = ["Standard Deviation", "Percentage"], group = BANDS_GROUP, tooltip = CALC_MODE_TOOLTIP, display = display.data_window)
+showBand_1 = input.bool(true, title = "", group = BANDS_GROUP, inline = "band_1", display = display.data_window)
+bandMult_1 = input.float(1.0, title = "Bands Multiplier #1", group = BANDS_GROUP, inline = "band_1", step = 0.5, minval=0, display = display.data_window, active = showBand_1)
+showBand_2 = input.bool(false, title = "", group = BANDS_GROUP, inline = "band_2", display = display.data_window)
+bandMult_2 = input.float(2.0, title = "Bands Multiplier #2", group = BANDS_GROUP, inline = "band_2", step = 0.5, minval=0, display = display.data_window, active = showBand_2)
+showBand_3 = input.bool(false, title = "", group = BANDS_GROUP, inline = "band_3", display = display.data_window)
+bandMult_3 = input.float(3.0, title = "Bands Multiplier #3", group = BANDS_GROUP, inline = "band_3", step = 0.5, minval=0, display = display.data_window, active = showBand_3)
+
+// Validate volume availability (optional)
+cumVolume = ta.cum(volume)
+if barstate.islast and cumVolume == 0
+    runtime.error("No volume is provided by the data vendor.")
+
+// Requests for earnings/dividends/splits to detect new period
+new_earnings = request.earnings(syminfo.tickerid, earnings.actual, barmerge.gaps_on, barmerge.lookahead_on, ignore_invalid_symbol=true)
+new_dividends = request.dividends(syminfo.tickerid, dividends.gross, barmerge.gaps_on, barmerge.lookahead_on, ignore_invalid_symbol=true)
+new_split = request.splits(syminfo.tickerid, splits.denominator, barmerge.gaps_on, barmerge.lookahead_on, ignore_invalid_symbol=true)
+
+// Detect new period based on anchor
+isNewPeriod = switch anchor
+    "Earnings"  => not na(new_earnings)
+    "Dividends" => not na(new_dividends)
+    "Splits"    => not na(new_split)
+    "Session"   => timeframe.change("D")
+    "Week"      => timeframe.change("W")
+    "Month"     => timeframe.change("M")
+    "Quarter"   => timeframe.change("3M")
+    "Year"      => timeframe.change("12M")
+    "Decade"    => timeframe.change("12M") and year % 10 == 0
+    "Century"   => timeframe.change("12M") and year % 100 == 0
+    => false
+
+isEsdAnchor = anchor == "Earnings" or anchor == "Dividends" or anchor == "Splits"
+if na(src_vwap[1]) and not isEsdAnchor
+    isNewPeriod := true
+
+// VWAP and Bands calculation
+var float vwapValue = na
+var float upperBandValue1 = na
+var float lowerBandValue1 = na
+var float upperBandValue2 = na
+var float lowerBandValue2 = na
+var float upperBandValue3 = na
+var float lowerBandValue3 = na
+
+if not (hideonDWM and timeframe.isdwm)
+    [_vwap, _stdevUpper, _] = ta.vwap(src_vwap, isNewPeriod, 1)
+    vwapValue := _vwap
+    stdevAbs = _stdevUpper - _vwap
+    bandBasis = calcModeInput == "Standard Deviation" ? stdevAbs : _vwap * 0.01
+    upperBandValue1 := _vwap + bandBasis * bandMult_1
+    lowerBandValue1 := _vwap - bandBasis * bandMult_1
+    upperBandValue2 := _vwap + bandBasis * bandMult_2
+    lowerBandValue2 := _vwap - bandBasis * bandMult_2
+    upperBandValue3 := _vwap + bandBasis * bandMult_3
+    lowerBandValue3 := _vwap - bandBasis * bandMult_3
+
+// VWAP plot
+plot(vwapValue, title = "VWAP", color = #2962FF, offset = offset)
+
+// Bands plots and fills
+upperBand_1 = plot(upperBandValue1, title="Upper Band #1", color = color.green, offset = offset, display = showBand_1 ? display.all : display.none, editable = showBand_1)
+lowerBand_1 = plot(lowerBandValue1, title="Lower Band #1", color = color.green, offset = offset, display = showBand_1 ? display.all : display.none, editable = showBand_1)
+fill(upperBand_1, lowerBand_1, title="Bands Fill #1", color = color.new(color.green, 95), display = showBand_1 ? display.all : display.none, editable = showBand_1)
+
+upperBand_2 = plot(upperBandValue2, title="Upper Band #2", color = color.olive, offset = offset, display = showBand_2 ? display.all : display.none, editable = showBand_2)
+lowerBand_2 = plot(lowerBandValue2, title="Lower Band #2", color = color.olive, offset = offset, display = showBand_2 ? display.all : display.none, editable = showBand_2)
+fill(upperBand_2, lowerBand_2, title="Bands Fill #2", color = color.new(color.olive, 95), display = showBand_2 ? display.all : display.none, editable = showBand_2)
+
+upperBand_3 = plot(upperBandValue3, title="Upper Band #3", color = color.teal, offset = offset, display = showBand_3 ? display.all : display.none, editable = showBand_3)
+lowerBand_3 = plot(lowerBandValue3, title="Lower Band #3", color = color.teal, offset = offset, display = showBand_3 ? display.all : display.none, editable = showBand_3)
+fill(upperBand_3, lowerBand_3, title="Bands Fill #3", color = color.new(color.teal, 95), display = showBand_3 ? display.all : display.none, editable = showBand_3)
