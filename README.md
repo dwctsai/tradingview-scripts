@@ -7,7 +7,7 @@ TradingView is a trading platform that specializes in charts for stocks and othe
 
 ## My Custom Indicators and Strategies
 
-### Custom Combo Indicator
+### Combo Indicator
 
 <p align="center">
     <img src="media/ema_vwap_indicators.jpg" width="500">
@@ -31,7 +31,7 @@ VWAP is only active for intraday charts (i.e. it won't work for daily charts or 
 
 Traders on the Free membership tier of TradingView are only allowed to add 2 indicators.  However, traders often want to add more indicators to their charts.
 
-For instance, traders who want to use an EMA indicator and a VWAP indicator quickly hit the max limit and cannot add more indicators they might want to use, such as "Relative Strength Index" (RSI) or "Moving Average Convergence and Divergeence" (MACD).  By combining indicators into a single indicator, you can free up an indicator slot to be freely used.
+For instance, traders who want to use an EMA indicator and a VWAP indicator quickly hit the max limit and cannot add more indicators they might want to use, such as "Relative Strength Index" (RSI) or "Moving Average Convergence and Divergence" (MACD).  By combining multiple indicators into a single indicator, your second allotted indicator slot can be freed up.
 
 ## How to Use in TradingView
 
