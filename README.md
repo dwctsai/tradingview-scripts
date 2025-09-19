@@ -1,4 +1,4 @@
-# TradingView Superchart Scripts for Market Indicators and Strategies
+# Market Indicators and Strategies for TradingView
 
 ## About TradingView
 
@@ -29,7 +29,7 @@ VWAP is only active for intraday charts (i.e. it won't work for daily charts or 
 
 ## Benefits of Using This Combo Indicator
 
-Traders on the Free tier of TradingView are only allowed to add 2 indicators to their charts.  However, traders often want to add more indicators.
+Traders on the Free membership tier of TradingView are only allowed to add 2 indicators.  However, traders often want to add more indicators to their charts.
 
 For instance, traders who want to use an EMA indicator and a VWAP indicator quickly hit the max limit and cannot add more indicators they might want to use, such as "Relative Strength Index" (RSI) or "Moving Average Convergence and Divergeence" (MACD).  By combining indicators into a single indicator, you can free up an indicator slot to be freely used.
 
