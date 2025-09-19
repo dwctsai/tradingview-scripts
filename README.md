@@ -1,6 +1,6 @@
 # Market Indicators and Strategies for TradingView
 
-## About TradingView
+### About TradingView
 
 TradingView is a trading platform that specializes in charts for stocks and other securities.  Traders can use the platform's built-in scripts to draw market indicators to their "supercharts".  Advanced traders can use [Pine Script](https://www.tradingview.com/pine-script-docs/welcome/), TradingView's custom programming language, to create their own custom trading indicators.
 
@@ -19,7 +19,7 @@ I've created a "combo indicator" that combines multiple indicators into a single
 
 Set up to five Exponential Moving Average trails.  An EMA is a type of moving average that gives more weight to recent price data and less to older data, making it more responsive to price changes than a simple moving average (SMA).  EMAs can be used to determine trend direction, with a rising EMA suggesting an uptrend and a falling EMA indicating a downtrend.
 
-Popular time periods that traders like to track are the 9, 21, 50, 100, and 200 time periods.
+Popular time periods that traders like to track are the 9, 20, 50, 100, and 200 time periods.
 
 #### Volume Weighted Average Price (VWAP) ####
 
