@@ -7,13 +7,13 @@ TradingView is a trading platform that specializes in charts for stocks.  It use
 
 ## My Custom Indicators and Strategies
 
-This repository is for custom Indicator and Strategy scripts which users can add to their TradingView Supercharts.
+This repository holds custom Indicator and Strategy scripts I created which users can add to their TradingView Supercharts.
 
-### Combo Indicator
+### Custom Combo Indicator
 
 The script for my "Combo Indicator" contains the following indicators:
 
-#### Multi EMA ####
+#### Multi EMA
 
 Set up to five Exponential Moving Average trails.  An EMA is a type of moving average that gives more weight to recent price data and less to older data, making it more responsive to price changes than a simple moving average (SMA).  EMAs can be used to determine trend direction, with a rising EMA suggesting an uptrend and a falling EMA indicating a downtrend.
 
@@ -27,10 +27,17 @@ VWAP is only active for intraday charts (i.e. it won't work for daily charts or 
 
 
 
-### How to Use
+## How to Use
 
 1. From TradingView, open the Superchart.
 2. Click the "Pine" button on the far-right vertical menu.
 3. Copy/paste code from a Pine script into the empty web IDE text field.
 4. Click the "Add to chart" button at the top.
 5. The custom indicator should now appear on the chart.
+
+
+## Benefits of Custom Indicators
+
+Traders on the Free tier of TradingView are allowed to only add 2 indicators to their charts.
+
+For instance, traders who want to use an EMA indicator and a VWAP indicator hit the max limit and cannot add more indicators they might want to use, such as "Relative Strength Index" (RSI) or "Moving Average Convergence and Divergeence" (MACD).
